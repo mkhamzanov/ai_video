@@ -24,6 +24,34 @@ import argparse, json, os, re, subprocess, sys, tempfile, urllib.request, urllib
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 FPS = 30
 
+# ── Нормализация русского текста для TTS ────────────────────────────────────
+# Экранные символы (₸, 3.5, ½, ×, −, +) TTS читает криво (говорит «три поинт файв»,
+# не произносит тенге). Приводим текст к «произносимой» форме ДО отправки в голос:
+# сперва свой премап символов, затем rutextnorm разворачивает числа в слова.
+try:
+    from rutextnorm import normalize_russian as _rutextnorm
+except Exception:
+    _rutextnorm = lambda x: x  # без либы — хотя бы премап символов
+
+_SYM = [
+    (r"₸", " тенге"),
+    (r"([-−])\s*(?=\d)", " минус "),        # −500 → минус 500
+    (r"\+\s*(?=\d)", " плюс "),              # +250 → плюс 250
+    (r"(?<=\d)[.,](?=\d)", ","),            # 3.5 → 3,5 (русский десятичный)
+    (r"\s*[×·]\s*", " умножить на "),        # × · → умножить на
+    (r"½", " одна вторая "),
+    (r"⅓", " одна треть "),
+    (r"(?<=\d)/(?=\d)", " делить на "),
+]
+
+
+def ru_speech(text):
+    """Экранный текст → произносимая русская форма (числа словами, символы раскрыты)."""
+    for pat, rep in _SYM:
+        text = re.sub(pat, rep, text)
+    text = re.sub(r"\s+", " ", text).strip()
+    return _rutextnorm(text)
+
 # Какой mp4 соответствует какому блоку (готовый рендер в корне проекта).
 BLOCK_MP4 = {
     "clickhouse": "clickhouse.mp4",
@@ -31,6 +59,7 @@ BLOCK_MP4 = {
     "llm": "llm.mp4",
     "rag": "rag.mp4",
     "rocauc": "rocauc.mp4",
+    "mathexp": "math-expectation.mp4",
     "taxonomy": "taxonomy.mp4",
     "kolmogorov": "kk-metric.mp4",
     "ai": "ai-origins.mp4",
@@ -66,12 +95,13 @@ def read_captions(block, lang):
     # Вырезаем массив CAPS, чтобы не зацепить start в CUES.
     m = re.search(r"CAPS\s*:\s*Cap\[\]\s*=\s*\[(.*?)\]\s*;", src, re.S)
     body = m.group(1) if m else src
+    # Необязательное поле say: точная произносимая форма реплики (перебивает авто-нормализацию).
     pairs = re.findall(
-        r"start\s*:\s*(\d+)\s*,\s*end\s*:\s*\d+\s*,\s*text\s*:\s*\"((?:[^\"\\]|\\.)*)\"",
+        r"start\s*:\s*(\d+)\s*,\s*end\s*:\s*\d+\s*,\s*text\s*:\s*\"((?:[^\"\\]|\\.)*)\""
+        r"(?:\s*,\s*say\s*:\s*\"((?:[^\"\\]|\\.)*)\")?",
         body,
     )
-    starts = [int(s) for s, _ in pairs]
-    ru_texts = [t for _, t in pairs]
+    starts = [int(s) for s, _, _ in pairs]
     if lang == "kk":
         kkp = os.path.join(os.path.dirname(__file__), "captions", f"{block}.kk.json")
         if not os.path.exists(kkp):
@@ -79,10 +109,13 @@ def read_captions(block, lang):
         kk = json.load(open(kkp, encoding="utf-8"))["lines"]
         if len(kk) != len(starts):
             sys.exit(f"KZ строк {len(kk)} != субтитров {len(starts)} в {block}. Синхронизируй.")
-        texts = kk
-    else:
-        texts = ru_texts
-    return [(s, strip_markup(t)) for s, t in zip(starts, texts)]
+        return [(s, strip_markup(t)) for s, t in zip(starts, kk)]
+    # ru: берём say если задан, иначе авто-нормализуем экранный текст субтитра.
+    out = []
+    for start, text, say in pairs:
+        spoken = strip_markup(say) if say else ru_speech(strip_markup(text))
+        out.append((int(start), spoken))
+    return out
 
 
 def tts(text, out_mp3, api_key, voice_id, model):

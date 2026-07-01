@@ -1,0 +1,5 @@
+# Зависимости автоозвучки (make.py). Ставить: pip install -r requirements.txt
+# rutextnorm — нормализация русского текста для TTS (числа/валюта/дроби словами).
+# num2words — запасной конвертер чисел в слова (RU).
+rutextnorm
+num2words

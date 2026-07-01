@@ -3,7 +3,9 @@ import { interpolate, spring, useCurrentFrame, useVideoConfig } from "remotion";
 import { C, FONT } from "../lib/brand";
 import { ZONE } from "./format";
 
-export type Cap = { start: number; end: number; text: string };
+// text — что видно на экране (с *акцентами*). say — необязательная произносимая
+// форма для озвучки (перебивает авто-нормализацию: «+250₸» → «плюс двести пятьдесят тенге»).
+export type Cap = { start: number; end: number; text: string; say?: string };
 
 // *слово* — подсветка бренд-красным.
 const markup = (text: string) =>

@@ -36,8 +36,9 @@ tts-samples/
 # Код блоков-роликов, кроме примера-заготовки _example:
 linreg/src/blocks/*
 !linreg/src/blocks/_example/
-# Реальный реестр композиций (список твоих роликов):
+# Реальный реестр композиций (список твоих роликов) + локальный entry для рендера:
 linreg/src/Root.local.tsx
+linreg/src/index.local.ts
 # Личная финальная фотка (рендерится в EndCard). В git — только avatar.example.jpg:
 linreg/public/avatar.jpg
 # Казахские переводы субтитров, кроме примера:
