@@ -1,0 +1,64 @@
+# Dependencies
+node_modules/
+**/node_modules/
+
+# Remotion / build output
+dist/
+**/dist/
+out/
+**/out/
+.remotion/
+**/.remotion/
+
+# Rendered videos (artifacts — re-rendered from source, not stored in git)
+*.mp4
+
+# Manim render cache / output (re-rendered from manim/*.py)
+media/
+**/__pycache__/
+*.pyc
+
+# Verification stills (debug only)
+chk/
+linreg/guide-props.json
+
+# Env & secrets
+.env
+.env.*
+!.env.example
+*.local
+
+# Тестовые TTS-сэмплы (черновики подбора голоса)
+tts-samples/
+
+# ── ЛОКАЛЬНЫЙ КОНТЕНТ (идеи/сценарии — в git НЕ хранятся) ───────────────
+# Репозиторий = движок. Реальные ролики живут только на диске.
+# Код блоков-роликов, кроме примера-заготовки _example:
+linreg/src/blocks/*
+!linreg/src/blocks/_example/
+# Реальный реестр композиций (список твоих роликов):
+linreg/src/Root.local.tsx
+# Личная финальная фотка (рендерится в EndCard). В git — только avatar.example.jpg:
+linreg/public/avatar.jpg
+# Казахские переводы субтитров, кроме примера:
+scripts/voiceover/captions/*
+!scripts/voiceover/captions/_example.kk.json
+# Manim-сценарии (математические анимации):
+manim/
+# Исходные кадры/картинки конкретных роликов:
+/shots/
+/aishots/
+/reelshots/
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editor
+.vscode/
+.idea/
+
+# Logs
+*.log
+npm-debug.log*
