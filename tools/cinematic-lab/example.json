@@ -1,0 +1,14 @@
+{
+  "duration": 6,
+  "label": "CINEMATIC LAB",
+  "kicker": "NEUTRAL ENGINE DEMO",
+  "source": "LOCAL ART · SILENT 2.5D COMPOSITION",
+  "shots": [
+    {"start":0,"end":3,"image":"example.svg","focus":[0.5,0.4],"zoom":[1.04,1.24],"motion":"doors"},
+    {"start":3,"end":6,"image":"example.svg","focus":[0.5,0.3],"zoom":[1.4,1.18],"motion":"paths"}
+  ],
+  "captions": [
+    {"start":0,"end":3,"lines":["Give a scene","a sense of depth."],"highlight":1},
+    {"start":3,"end":6,"lines":["Keep the words","close to the action."],"highlight":1}
+  ]
+}
