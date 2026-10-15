@@ -1,0 +1,7 @@
+{
+  "name": "cinematic-25d-lab",
+  "private": true,
+  "type": "module",
+  "version": "0.2.0",
+  "dependencies": {"@napi-rs/canvas": "0.1.100"}
+}
