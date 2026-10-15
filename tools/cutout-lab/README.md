@@ -15,7 +15,7 @@ node render.mjs example.mjs example.mp4
 node render.mjs example.mjs poster.png --still=7 --width=720
 ```
 
-Default output: 1080×1920, 30 FPS, yuv420p, H.264, no audio stream, faststart.
+Default output: 1080×1920, 30 FPS, yuv420p, H.264, no audio stream, faststart. Each render writes to a unique temporary MP4 and atomically renames it after FFmpeg exits successfully; overlapping jobs cannot corrupt the destination by interleaving writes.
 `--width=720` produces a smaller 720×1280 render. The rasterizer renders the SVG directly at the requested density, preserving sharp vector typography at 1080×1920.
 
 ## Private compositions
